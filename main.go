@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"net/url"
 
 	"github.com/chromedp/chromedp"
@@ -30,10 +32,29 @@ func main() {
 
 	if myMapPtr["src"] != "" {
 		fmt.Println("src:", myMapPtr["src"])
+		getData(myMapPtr["src"])
 	} else {
 		fmt.Println("Attributes:", myMapPtr)
 	}
 
+}
+
+func getData(path string) {
+
+	req, err := http.Get(path)
+
+	if err != nil {
+		return
+	}
+
+	defer req.Body.Close()
+
+	data, err := io.ReadAll(req.Body)
+
+	if err != nil {
+		return
+	}
+	fmt.Println(string(data))
 }
 
 func encodeURIComponent() string {
@@ -44,5 +65,4 @@ func encodeURIComponent() string {
 	q := u.Query()
 	u.RawQuery = q.Encode()
 	return (u.String())
-
 }
